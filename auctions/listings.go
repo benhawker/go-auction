@@ -19,14 +19,28 @@ import (
 //   timestamp2: [shoes, book],
 // }
 
+// Output -> an exported type with only the required fields for logging output to the terminal
+type Output struct {
+	Status        string
+	Item          string
+	BuyerID       string
+	CloseTime     int
+	PricePaid     float64
+	TotalBidCount int
+	HighestBid    float64
+	LowestBid     float64
+}
+
 type listingsRegistryDefinition map[string]*listing
 type expiryRegistryDefinition map[int][]string
 
 var listingsRegistry = make(listingsRegistryDefinition)
 var expiryRegistry = make(expiryRegistryDefinition)
 
-// RegisterListing => for each listing (SELL) row store the data in both the listingsRegistry & the expiryRegistry.
+// RegisterListing -> for each listing (SELL) row store the data in both the listingsRegistry & the expiryRegistry
 func RegisterListing(rowData []string) error {
+	// Arguably we could separate the type conversion/parsing from the creation of the listing.
+	// Type conversion can be handled separately then passing a 'sellRow' struct  to a fn to register the listing.
 	timestamp, err := strconv.Atoi(rowData[0])
 	if err != nil {
 		return err
@@ -67,8 +81,10 @@ func RegisterListing(rowData []string) error {
 	return nil
 }
 
-// HandleEndingListings => checks against the expiryRegistry for each timestamp and ends the listing if appropriate.
-func HandleEndingListings(timestamp int) error {
+// HandleEndingListings => checks against the expiryRegistry for each timestamp and ends the listing if appropriate
+func HandleEndingListings(timestamp int) ([]Output, error) {
+	var returnValue []Output
+
 	if endingListings, ok := expiryRegistry[timestamp]; ok {
 		for _, listingName := range endingListings {
 
@@ -76,12 +92,14 @@ func HandleEndingListings(timestamp int) error {
 
 			err := l.endListing()
 			if err != nil {
-				return err
+				return returnValue, err
 			}
+
+			returnValue = append(returnValue, l.toOutput())
 		}
 	}
 
-	return nil
+	return returnValue, nil
 }
 
 func addListingToRegistries(l listing) error {
@@ -95,4 +113,17 @@ func addListingToRegistries(l listing) error {
 	expiryRegistry[l.closeTime] = current
 
 	return nil
+}
+
+func (l *listing) toOutput() Output {
+	return Output{
+		CloseTime:     l.closeTime,
+		Item:          l.item,
+		BuyerID:       l.getBuyerUserID(),
+		PricePaid:     l.pricePaid,
+		Status:        l.status,
+		LowestBid:     l.lowestBid,
+		HighestBid:    l.highestBid,
+		TotalBidCount: l.totalBidCount,
+	}
 }

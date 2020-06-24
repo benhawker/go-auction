@@ -7,6 +7,8 @@ import (
 
 // RegisterBid => For each bid row store the data within the appropriate listing
 func RegisterBid(rowData []string) error {
+	// Arguably we could separate the type conversion/parsing from the creation of the bid.
+	// Type conversion can be handled separately then passing a 'bidRow' struct  to a fn to register the bid on the listing.
 	timestamp, err := strconv.Atoi(rowData[0])
 	if err != nil {
 		return err

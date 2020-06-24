@@ -2,7 +2,6 @@ package auctions
 
 import (
 	"fmt"
-	"log"
 	"sort"
 	"strconv"
 )
@@ -88,12 +87,12 @@ func (l *listing) endListing() error {
 	l.strUserID = ""
 	l.status = unsoldStatus
 
-	// When there are bids run the following block and assign values to the output struct.
 	bids, err := l.getBids()
 	if err != nil {
 		return err
 	}
 
+	// When there are bids run the following block and assign values to the output struct.
 	if len(bids) > 0 {
 		l.sortBidsByAmountAndTimestamp()
 
@@ -108,22 +107,7 @@ func (l *listing) endListing() error {
 		l.lowestBid = min
 	}
 
-	l.printOutput()
-
 	return nil
-}
-
-func (l *listing) printOutput() {
-	log.Printf("%d|%s|%s|%s|%.2f|%d|%.2f|%.2f \n",
-		l.closeTime,
-		l.item,
-		l.getBuyerUserID(),
-		l.status,
-		l.pricePaid,
-		l.totalBidCount,
-		l.highestBid,
-		l.lowestBid,
-	)
 }
 
 func (l *listing) getMinBid() float64 {

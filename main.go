@@ -79,5 +79,29 @@ func handleRow(rowData []string, rowNumber int) error {
 		}
 	}
 
-	return auctions.HandleEndingListings(timestamp)
+	output, err := auctions.HandleEndingListings(timestamp)
+	if err != nil {
+		return err
+	}
+
+	if len(output) > 0 {
+		for _, o := range output {
+			printFormattedOutput(o)
+		}
+	}
+
+	return nil
+}
+
+func printFormattedOutput(o auctions.Output) {
+	log.Printf("%d|%s|%s|%s|%.2f|%d|%.2f|%.2f \n",
+		o.CloseTime,
+		o.Item,
+		o.BuyerID,
+		o.Status,
+		o.PricePaid,
+		o.TotalBidCount,
+		o.HighestBid,
+		o.LowestBid,
+	)
 }
