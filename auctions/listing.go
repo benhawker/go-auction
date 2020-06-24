@@ -16,7 +16,6 @@ const (
 type shared struct {
 	timestamp int
 	userID    int
-	strUserID string
 	action    string
 	item      string
 }
@@ -84,7 +83,6 @@ func (l *listing) addBid(bid bid) error {
 }
 
 func (l *listing) endListing() error {
-	l.strUserID = ""
 	l.status = unsoldStatus
 
 	bids, err := l.getBids()

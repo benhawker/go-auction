@@ -35,7 +35,10 @@ func RegisterBid(rowData []string) error {
 	}
 
 	if listing, ok := listingsRegistry[b.shared.item]; ok {
-		listing.addBid(b)
+		err = listing.addBid(b)
+		if err != nil {
+			return err
+		}
 	} else {
 		return errors.New("Listing Not Found")
 	}
